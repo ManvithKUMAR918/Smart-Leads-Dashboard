@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Smart Leads Dashboard
 
 A full-stack Lead Management Dashboard built with the **MERN stack** (MongoDB, Express.js, React.js, Node.js) using **TypeScript** throughout.
@@ -193,3 +194,6 @@ See `.env.example` for all required variables:
 | JWT_SECRET | JWT signing secret | — |
 | JWT_EXPIRES_IN | Token expiry | 7d |
 | CLIENT_URL | Frontend URL (CORS) | http://localhost:5173 |
+=======
+# Smart-Leads-Dashboard
+>>>>>>> cb8a0c12d0e92dbce9e4c3a6f7784418b2b344a1
