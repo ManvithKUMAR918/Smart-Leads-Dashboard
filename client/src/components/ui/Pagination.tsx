@@ -1,5 +1,5 @@
 import { type PaginationMeta } from '../../types';
-import { HiOutlineChevronLeft, HiOutlineChevronRight } from 'react-icons/hi';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
   pagination: PaginationMeta;
@@ -31,27 +31,47 @@ const Pagination = ({ pagination, onPageChange }: PaginationProps) => {
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2" id="pagination-controls">
-      <p className="text-sm text-surface-500 dark:text-surface-400">
-        Showing <span className="font-semibold text-surface-700 dark:text-surface-300">{startItem}-{endItem}</span> of{' '}
-        <span className="font-semibold text-surface-700 dark:text-surface-300">{total}</span> leads
+      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        Showing{' '}
+        <span className="font-semibold text-zinc-700 dark:text-zinc-300">{startItem}–{endItem}</span>{' '}
+        of <span className="font-semibold text-zinc-700 dark:text-zinc-300">{total}</span> leads
       </p>
       <div className="flex items-center gap-1">
-        <button onClick={() => onPageChange(page - 1)} disabled={!hasPrevPage}
-          className="p-2 rounded-xl text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors" id="prev-page">
-          <HiOutlineChevronLeft className="w-4 h-4" />
+        <button
+          onClick={() => onPageChange(page - 1)}
+          disabled={!hasPrevPage}
+          className="p-2 rounded-lg text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          id="prev-page"
+        >
+          <ChevronLeft className="w-4 h-4" />
         </button>
         {getPageNumbers().map((p, i) =>
           typeof p === 'string' ? (
-            <span key={`e-${i}`} className="px-1 text-surface-400 text-sm">{p}</span>
+            <span key={`e-${i}`} className="px-1 text-zinc-400 text-sm select-none">
+              {p}
+            </span>
           ) : (
-            <button key={p} onClick={() => onPageChange(p)}
-              className={`w-9 h-9 rounded-xl text-sm font-medium transition-colors ${p === page ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/25' : 'text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800'}`}
-              id={`page-${p}`}>{p}</button>
+            <button
+              key={p}
+              onClick={() => onPageChange(p)}
+              className={`w-9 h-9 rounded-lg text-sm font-medium transition-all duration-200 ${
+                p === page
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
+              }`}
+              id={`page-${p}`}
+            >
+              {p}
+            </button>
           )
         )}
-        <button onClick={() => onPageChange(page + 1)} disabled={!hasNextPage}
-          className="p-2 rounded-xl text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors" id="next-page">
-          <HiOutlineChevronRight className="w-4 h-4" />
+        <button
+          onClick={() => onPageChange(page + 1)}
+          disabled={!hasNextPage}
+          className="p-2 rounded-lg text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          id="next-page"
+        >
+          <ChevronRight className="w-4 h-4" />
         </button>
       </div>
     </div>

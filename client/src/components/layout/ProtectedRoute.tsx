@@ -1,15 +1,16 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-950">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#050505]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
-          <p className="text-surface-500 dark:text-surface-400 text-sm font-medium">Loading...</p>
+          <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Loading...</p>
         </div>
       </div>
     );

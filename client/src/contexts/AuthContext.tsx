@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
-      const message = axiosError.response?.data?.message || 'Registration failed';
+      const message = axiosError.response?.data?.message || axiosError.message || 'Registration failed';
       toast.error(message);
       throw error;
     }

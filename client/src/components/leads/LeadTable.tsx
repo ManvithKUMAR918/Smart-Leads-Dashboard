@@ -1,7 +1,9 @@
 import { type Lead, UserRole } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
-import { getStatusColor, getSourceColor, formatDate, getInitials } from '../../utils/helpers';
-import { HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from 'react-icons/hi';
+import { formatDate, getInitials } from '../../utils/helpers';
+import Badge, { statusVariant, sourceVariant } from '../ui/Badge';
+import { Pencil, Trash2, Eye, Inbox } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface LeadTableProps {
   leads: Lead[];
@@ -11,32 +13,46 @@ interface LeadTableProps {
   onView: (lead: Lead) => void;
 }
 
+/* ─── Skeleton Row ────────────────────────────────────── */
 const SkeletonRow = () => (
-  <tr className="border-b border-surface-100 dark:border-surface-800">
+  <tr className="border-b border-zinc-100 dark:border-zinc-800/50">
     {Array.from({ length: 6 }).map((_, i) => (
       <td key={i} className="px-5 py-4">
-        <div className="skeleton h-4 rounded" style={{ width: `${60 + Math.random() * 40}%` }} />
+        <div
+          className="skeleton h-4 rounded"
+          style={{ width: `${55 + Math.random() * 35}%` }}
+        />
       </td>
     ))}
   </tr>
+);
+
+/* ─── Table Header ────────────────────────────────────── */
+const TH = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+  <th
+    className={`text-left px-5 py-3.5 text-[11px] font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider ${className}`}
+  >
+    {children}
+  </th>
 );
 
 const LeadTable = ({ leads, isLoading, onEdit, onDelete, onView }: LeadTableProps) => {
   const { user } = useAuth();
   const isAdmin = user?.role === UserRole.ADMIN;
 
+  /* ── Loading State ──────────────────────────────────── */
   if (isLoading) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-surface-200 dark:border-surface-700/50 bg-white dark:bg-surface-900">
+      <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/50">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-surface-200 dark:border-surface-700/50 bg-surface-50 dark:bg-surface-800/50">
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider">Name</th>
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider hidden sm:table-cell">Email</th>
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider">Status</th>
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider hidden md:table-cell">Source</th>
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider hidden lg:table-cell">Created</th>
-              <th className="text-right px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider">Actions</th>
+            <tr className="border-b border-zinc-200 dark:border-zinc-800/60 bg-zinc-50/80 dark:bg-zinc-900/80">
+              <TH>Name</TH>
+              <TH className="hidden sm:table-cell">Email</TH>
+              <TH>Status</TH>
+              <TH className="hidden md:table-cell">Source</TH>
+              <TH className="hidden lg:table-cell">Created</TH>
+              <TH className="text-right!">Actions</TH>
             </tr>
           </thead>
           <tbody>
@@ -49,109 +65,124 @@ const LeadTable = ({ leads, isLoading, onEdit, onDelete, onView }: LeadTableProp
     );
   }
 
+  /* ── Empty State ────────────────────────────────────── */
   if (leads.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-6 bg-white dark:bg-surface-900 rounded-2xl border border-surface-200 dark:border-surface-700/50">
-        <div className="w-16 h-16 rounded-2xl bg-surface-100 dark:bg-surface-800 flex items-center justify-center mb-4">
-          <HiOutlineEye className="w-8 h-8 text-surface-400" />
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="flex flex-col items-center justify-center py-24 px-6 bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800/60"
+      >
+        <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800/60 flex items-center justify-center mb-5">
+          <Inbox className="w-8 h-8 text-zinc-400 dark:text-zinc-500" />
         </div>
-        <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-1">No leads found</h3>
-        <p className="text-sm text-surface-500 dark:text-surface-400 text-center max-w-sm">
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1.5">
+          No leads found
+        </h3>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center max-w-sm leading-relaxed">
           Try adjusting your filters or search criteria, or create a new lead to get started.
         </p>
-      </div>
+      </motion.div>
     );
   }
 
+  /* ── Data Table ─────────────────────────────────────── */
   return (
-    <div className="overflow-x-auto rounded-2xl border border-surface-200 dark:border-surface-700/50 bg-white dark:bg-surface-900">
+    <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/50">
       <table className="w-full" id="leads-table">
         <thead>
-          <tr className="border-b border-surface-200 dark:border-surface-700/50 bg-surface-50 dark:bg-surface-800/50">
-            <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider">Name</th>
-            <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider hidden sm:table-cell">Email</th>
-            <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider">Status</th>
-            <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider hidden md:table-cell">Source</th>
-            <th className="text-left px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider hidden lg:table-cell">Created</th>
-            <th className="text-right px-5 py-3.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider">Actions</th>
+          <tr className="border-b border-zinc-200 dark:border-zinc-800/60 bg-zinc-50/80 dark:bg-zinc-900/80">
+            <TH>Name</TH>
+            <TH className="hidden sm:table-cell">Email</TH>
+            <TH>Status</TH>
+            <TH className="hidden md:table-cell">Source</TH>
+            <TH className="hidden lg:table-cell">Created</TH>
+            <TH className="text-right!">Actions</TH>
           </tr>
         </thead>
         <tbody>
           {leads.map((lead, index) => (
-            <tr
+            <motion.tr
               key={lead._id}
-              className="border-b border-surface-100 dark:border-surface-800 hover:bg-surface-50 dark:hover:bg-surface-800/30 transition-colors animate-fade-in"
-              style={{ animationDelay: `${index * 30}ms` }}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, delay: index * 0.03, ease: 'easeOut' }}
+              className="border-b border-zinc-100 dark:border-zinc-800/40 hover:bg-zinc-50/70 dark:hover:bg-zinc-800/30 transition-colors duration-150 group"
             >
               {/* Name + Avatar */}
-              <td className="px-5 py-4">
+              <td className="px-5 py-3.5">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0 shadow-sm shadow-indigo-500/20">
                     {getInitials(lead.name)}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-surface-900 dark:text-white truncate">{lead.name}</p>
-                    <p className="text-xs text-surface-400 sm:hidden truncate">{lead.email}</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                      {lead.name}
+                    </p>
+                    <p className="text-xs text-zinc-400 sm:hidden truncate">{lead.email}</p>
                   </div>
                 </div>
               </td>
 
               {/* Email */}
-              <td className="px-5 py-4 hidden sm:table-cell">
-                <p className="text-sm text-surface-600 dark:text-surface-300 truncate max-w-[200px]">{lead.email}</p>
+              <td className="px-5 py-3.5 hidden sm:table-cell">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate max-w-[200px]">
+                  {lead.email}
+                </p>
               </td>
 
               {/* Status */}
-              <td className="px-5 py-4">
-                <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${getStatusColor(lead.status)}`}>
+              <td className="px-5 py-3.5">
+                <Badge variant={statusVariant(lead.status)} dot>
                   {lead.status}
-                </span>
+                </Badge>
               </td>
 
               {/* Source */}
-              <td className="px-5 py-4 hidden md:table-cell">
-                <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${getSourceColor(lead.source)}`}>
-                  {lead.source}
-                </span>
+              <td className="px-5 py-3.5 hidden md:table-cell">
+                <Badge variant={sourceVariant(lead.source)}>{lead.source}</Badge>
               </td>
 
               {/* Created At */}
-              <td className="px-5 py-4 hidden lg:table-cell">
-                <p className="text-sm text-surface-500 dark:text-surface-400">{formatDate(lead.createdAt)}</p>
+              <td className="px-5 py-3.5 hidden lg:table-cell">
+                <p className="text-sm text-zinc-500 dark:text-zinc-500">
+                  {formatDate(lead.createdAt)}
+                </p>
               </td>
 
               {/* Actions */}
-              <td className="px-5 py-4">
-                <div className="flex items-center justify-end gap-1">
+              <td className="px-5 py-3.5">
+                <div className="flex items-center justify-end gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity duration-150">
                   <button
                     onClick={() => onView(lead)}
-                    className="p-2 rounded-lg text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                    className="p-2 rounded-lg text-zinc-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors duration-150"
                     title="View Lead"
                     id={`view-lead-${lead._id}`}
                   >
-                    <HiOutlineEye className="w-4 h-4" />
+                    <Eye className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => onEdit(lead)}
-                    className="p-2 rounded-lg text-surface-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
+                    className="p-2 rounded-lg text-zinc-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors duration-150"
                     title="Edit Lead"
                     id={`edit-lead-${lead._id}`}
                   >
-                    <HiOutlinePencil className="w-4 h-4" />
+                    <Pencil className="w-4 h-4" />
                   </button>
                   {isAdmin && (
                     <button
                       onClick={() => onDelete(lead)}
-                      className="p-2 rounded-lg text-surface-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      className="p-2 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-150"
                       title="Delete Lead"
                       id={`delete-lead-${lead._id}`}
                     >
-                      <HiOutlineTrash className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   )}
                 </div>
               </td>
-            </tr>
+            </motion.tr>
           ))}
         </tbody>
       </table>
